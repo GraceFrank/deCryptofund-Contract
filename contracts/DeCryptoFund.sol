@@ -9,12 +9,12 @@ contract DeCryptoFund {
         console.log("Yo yo, I am a contract am I am smart");
     }
 
-    function wave() public {
+    function fund() public {
         totalFunding += 1;
         console.log("%s has waved!", msg.sender);
     }
 
-    function gettotalFunding() public view returns (uint256) {
+    function getTotalFunding() public view returns (uint256) {
         console.log("We have %d total waves!", totalFunding);
         return totalFunding;
     }
