@@ -1,15 +1,14 @@
 const main = async () => {
-  const [owner] = await hre.ethers.getSigners();
-  const accountBalance = await owner.getBalance();
+  const deCryptoFundContractFactory = await hre.ethers.getContractFactory(
+    "DeCryptoFund"
+  );
+  const deCryptoFundContract = await deCryptoFundContractFactory.deploy({
+    value: hre.ethers.utils.parseEther("0.001"),
+  });
 
-  console.log("Deploying contracts with account: ", owner.address);
-  console.log("Account balance: ", accountBalance.toString());
+  await deCryptoFundContract.deployed();
 
-  const Token = await hre.ethers.getContractFactory("DeCryptoFund");
-  const portal = await Token.deploy();
-  await portal.deployed();
-
-  console.log("DeCryptoFund address: ", portal.address);
+  console.log("DeCryptoFund address: ", deCryptoFundContract.address);
 };
 
 const runMain = async () => {

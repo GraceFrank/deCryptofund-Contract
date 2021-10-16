@@ -1,34 +1,48 @@
-const hre = require("hardhat");
-
-async function main() {
-  //
-  const [owner, randomPerson] = await hre.ethers.getSigners();
-
-  const DeCryptoFundFactory = await hre.ethers.getContractFactory(
+const main = async () => {
+  const deCryptoFundContractFactory = await hre.ethers.getContractFactory(
     "DeCryptoFund"
   );
-  const deCryptoFundContract = await DeCryptoFundFactory.deploy();
+  const deCryptoFundContract = await deCryptoFundContractFactory.deploy({
+    value: hre.ethers.utils.parseEther("0.1"),
+  });
   await deCryptoFundContract.deployed();
+  console.log("Contract addy:", deCryptoFundContract.address);
 
-  console.log("Contract deployed to:", deCryptoFundContract.address);
-  console.log("Contract deployed by:", owner.address);
-  console.log("DeCryptoFund deployed to:", deCryptoFundContract.address);
+  let contractBalance = await hre.ethers.provider.getBalance(
+    deCryptoFundContract.address
+  );
+  console.log(
+    "Contract balance:",
+    hre.ethers.utils.formatEther(contractBalance)
+  );
 
-  let fundCount = await deCryptoFundContract.getTotalFunding();
-  const fundTnx = await deCryptoFundContract.fund();
-  fundTnx.wait();
+  /*
+   * Let's try two funding now
+   */
+  const fundTnx = await deCryptoFundContract.fund("This is funding #1");
+  await fundTnx.wait();
 
-  fundCount = deCryptoFundContract.getTotalFunding();
+  const fundTnx2 = await deCryptoFundContract.fund("This is funding #2");
+  await fundTnx2.wait();
 
-  waveTxn = await deCryptoFundContract.connect(randomPerson).fund();
-  await waveTxn.wait();
+  contractBalance = await hre.ethers.provider.getBalance(deCryptoFundContract.address);
+  console.log(
+    "Contract balance:",
+    hre.ethers.utils.formatEther(contractBalance)
+  );
 
-  waveCount = await deCryptoFundContract.getTotalFunding();
-}
+  let allFunding = await deCryptoFundContract.getAllFundings();
+  console.log(allFunding);
+};
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+const runMain = async () => {
+  try {
+    await main();
+    process.exit(0);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
+
+runMain();
